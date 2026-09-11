@@ -97,13 +97,6 @@
   <header><h1>Germany Decision Cockpit</h1><p>Compare the consequences of LUMEN’s launch choices—price, commercial channel and acquisition investment—before committing to a German market entry plan.</p></header>
   <main>
     <div class="notice"><strong>This is a scenario model, not a German-sales forecast.</strong> LUMEN has no German sales history. The cockpit applies German price-test results and home-market marketing benchmarks, then makes every assumption visible.</div>
-    <section class="card decision-curve" aria-labelledby="decision-curve-title">
-      <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
-      <h2 id="decision-curve-title">Value created over the launch year</h2>
-      <p class="data-note">The curve updates with the scenario inputs above. It includes seasonality, demand ramp-up and channel adoption, so different choices create different trajectories. The x-axis starts at the selected launch month and follows the next 12 months.</p>
-      <p class="data-note" id="curveAssumptions"></p><div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span></div>
-      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created curve"></svg>
-    </section>
 
 <div class="layout">
       <aside class="card controls">
@@ -117,7 +110,14 @@
         <div class="field"><label for="dtc">DTC online <span class="value" id="dtcLabel">40%</span></label><input id="dtc" type="range" min="0" max="100" value="40"></div>
         <div class="field"><label for="retail">Retail / grocery <span class="value" id="retailLabel">35%</span></label><input id="retail" type="range" min="0" max="100" value="35"></div>
         <div class="field"><label for="gym">Gym &amp; office <span class="value" id="gymLabel">25%</span></label><input id="gym" type="range" min="0" max="100" value="25"><small id="mixWarning"></small></div>
-      </aside>
+      
+    <section class="card decision-curve" aria-labelledby="decision-curve-title">
+      <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
+      <h2 id="decision-curve-title">Value created over the launch year</h2>
+      <p class="data-note">The curve updates with the scenario inputs above. It includes seasonality, demand ramp-up and channel adoption, so different choices create different trajectories. The x-axis starts at the selected launch month and follows the next 12 months.</p>
+      <p class="data-note" id="curveAssumptions"></p><div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span></div>
+      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created curve"></svg>
+    </section></aside>
       <section>
         <div class="metrics">
           <div class="metric accent"><strong id="acceptance">51.7%</strong><span>Estimated price acceptance</span></div>
