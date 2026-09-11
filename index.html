@@ -166,7 +166,7 @@
     const euro = n => new Intl.NumberFormat('en-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n);
     const number = n => new Intl.NumberFormat('en-DE',{maximumFractionDigits:0}).format(n);
     function weights() { const raw={DTC:+el('dtc').value,Retail:+el('retail').value,Gym:+el('gym').value}; const total=raw.DTC+raw.Retail+raw.Gym; return {raw,total,w:{DTC:raw.DTC/total,Retail:raw.Retail/total,Gym:raw.Gym/total}}; }
-    function calc(){
+    function calc(){ renderTrajectoryChart();
       const {raw,total,w}=weights(), p=priceTests[price], budget=+el('budget').value, repeats=+el('repeat').value, season=+el('month').value;
       const weighted = key => Object.keys(w).reduce((sum,k)=>sum+w[k]*marketing[k][key],0);
       const unit = Object.keys(w).reduce((sum,k)=>sum+w[k]*p[k],0), cac=weighted('cac'), ltv=weighted('ltv');
