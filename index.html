@@ -81,18 +81,29 @@
     .decision-stats { display:grid; gap:5px; margin-top:12px; color:#b9cbc4; font-size:12px; }
     .decision-stats b { color:#edf6f0; }
     @media(max-width:560px) { .decision-chart { grid-template-columns:1fr; } .decision-column .score-track { height:110px; } }
+
+    .decision-curve { margin:24px 0; }
+    .curve-legend { display:flex; gap:20px; flex-wrap:wrap; color:#b9cbc4; font-size:12px; margin:14px 0 4px; }
+    .curve-legend i { display:inline-block; width:20px; height:3px; margin-right:6px; vertical-align:middle; }
+    .legend-value { background:var(--cyan); }.legend-cost { background:var(--orange); }
+    .trajectory-svg { display:block; width:100%; height:auto; min-height:220px; overflow:visible; }
+    .trajectory-svg text { fill:#91aaa3; font:11px Helvetica,Arial,sans-serif; }
+    .trajectory-svg .gridline { stroke:#294044; stroke-width:1; }.trajectory-svg .axis { stroke:#567276; stroke-width:1; }
+    .trajectory-svg .value-line { fill:none; stroke:var(--cyan); stroke-width:3; }.trajectory-svg .cost-line { fill:none; stroke:var(--orange); stroke-width:2; stroke-dasharray:6 5; }
+    .trajectory-svg .value-dot { fill:var(--cyan); }.trajectory-svg .cost-dot { fill:var(--orange); }
 </style>
 </head>
 <body>
   <header><h1>Germany Decision Cockpit</h1><p>Compare the consequences of LUMEN’s launch choices—price, commercial channel and acquisition investment—before committing to a German market entry plan.</p></header>
   <main>
     <div class="notice"><strong>This is a scenario model, not a German-sales forecast.</strong> LUMEN has no German sales history. The cockpit applies German price-test results and home-market marketing benchmarks, then makes every assumption visible.</div>
-    
-    <section class="card decision-graph" aria-labelledby="decision-graph-title">
-      <p class="analysis-kicker">DECISION TRAJECTORY / SCENARIO COMPARISON</p>
-      <h2 id="decision-graph-title">How the decision changes the outcome</h2>
-      <p class="data-note">Each column applies the cockpit’s preset for that leadership lens. The bar is the 0–100 fit score; the figures underneath show the operational consequence.</p>
-      <div class="decision-chart" id="decisionChart"></div>
+
+    <section class="card decision-curve" aria-labelledby="decision-curve-title">
+      <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
+      <h2 id="decision-curve-title">Value created vs. acquisition cost</h2>
+      <p class="data-note">The curves update with the scenario inputs above. Value created is estimated monthly contribution; cost is the monthly share of the launch acquisition budget.</p>
+      <div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span><span><i class="legend-cost"></i>Acquisition cost</span></div>
+      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created and acquisition cost curves"></svg>
     </section>
 <div class="layout">
       <aside class="card controls">
@@ -193,13 +204,10 @@
     // Optional enhancement: existing repository files can replace the seeded numbers when served from the repo root.
     async function enrich(){ try { const text=await (await fetch('data/price_test_results.csv')).text(); if(!text.includes('price_eur')) throw Error(); el('dataStatus').textContent='Live repository data connected: Exhibit 11 pricing tests loaded. No respondent-level customer data is read or displayed.'; } catch(e){} }
     enrich();
-  
-    function renderDecisionGraph(){
-      const cases=[{id:"premium",name:"CMO: premium",price:"2.59",budget:100000,repeat:12,dtc:30,retail:40,gym:30},{id:"balanced",name:"Balanced",price:"2.19",budget:60000,repeat:12,dtc:40,retail:35,gym:25},{id:"roi",name:"CFO: fast ROI",price:"1.79",budget:40000,repeat:12,dtc:40,retail:25,gym:35}];
-      const labels={DTC:"DTC",Retail:"Retail",Gym:"Gym"};
-      const html=cases.map(c=>{ const p=priceTests[c.price], total=c.dtc+c.retail+c.gym, w={DTC:c.dtc/total,Retail:c.retail/total,Gym:c.gym/total}; const unit=Object.keys(w).reduce((s,k)=>s+w[k]*p[k],0), cac=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].cac,0), ltv=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].ltv,0); const customers=(c.budget/cac)*(p.acceptance/51.7), annual=customers*c.repeat*unit, payback=c.budget/Math.max(annual/12,1); const premium=(+c.price-1.79)/.8*45+(p.acceptance/61.7)*20+(unit/1.54)*20+(ltv/cac/3)*15, roi=(unit/1.54)*35+(ltv/cac/3)*35+(1/Math.max(payback,1))*30, score=c.id==="premium"?premium:c.id==="roi"?roi:(premium+roi)/2; return `<article class="decision-column"><h3>${c.name}</h3><div class="score-track"><div class="score-bar" style="height:${Math.min(score,100)}%"><strong>${Math.round(score)}</strong></div></div><div class="decision-stats"><span>Price <b>€${c.price}</b></span><span>Acceptance <b>${p.acceptance.toFixed(1)}%</b></span><span>Annual contribution <b>${euro(annual)}</b></span><span>Payback <b>${payback>24?"24+":payback.toFixed(1)} mo</b></span></div></article>`; }).join(""); el("decisionChart").innerHTML=html;
+
+    function renderTrajectoryChart(){
+      const svg=el("trajectorySvg"); if(!svg) return; const p=priceTests[price], {w}=weights(), budget=+el("budget").value, repeats=+el("repeat").value; const unit=Object.keys(w).reduce((s,k)=>s+w[k]*p[k],0), cac=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].cac,0); const months=[...el("month").options].map((o,i)=>({name:o.textContent.slice(0,3),season:+o.value,index:i})); const points=months.map(m=>{const customers=(budget/cac)*m.season*(p.acceptance/51.7); return {value:customers*repeats*unit/12,cost:budget/12};}); const max=Math.max(...points.flatMap(x=>[x.value,x.cost]),1)*1.18, W=760,H=320,L=52,R=18,T=18,B=42, pw=W-L-R, ph=H-T-B; const x=i=>L+(i/(points.length-1))*pw, y=v=>T+ph-(v/max)*ph; const poly=(key,cls)=>`<polyline class="${cls}" points="${points.map((p,i)=>x(i)+","+y(p[key])).join(" ")}"/>`; const dots=(key,cls)=>points.map((p,i)=>`<circle class="${cls}" cx="${x(i)}" cy="${y(p[key])}" r="3"/>`).join(""); const grid=[0,.25,.5,.75,1].map(t=>`<line class="gridline" x1="${L}" x2="${W-R}" y1="${y(max*t)}" y2="${y(max*t)}"/><text x="${L-8}" y="${y(max*t)+4}" text-anchor="end">${euro(max*t)}</text>`).join(""); const labels=months.map((m,i)=>`<text x="${x(i)}" y="${H-16}" text-anchor="middle">${m.name}</text>`).join(""); svg.innerHTML=`${grid}<line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${H-B}"/><line class="axis" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>${poly("value","value-line")}${poly("cost","cost-line")}${dots("value","value-dot")}${dots("cost","cost-dot")}${labels}<text x="${L}" y="12">€ / month</text>`;
     }
-    renderDecisionGraph();
-</script>
+    renderTrajectoryChart();</script>
 </body>
 </html>
