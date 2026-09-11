@@ -55,6 +55,10 @@
     table { display:block; overflow-x:auto; white-space:nowrap; }
     @media (max-width: 900px) { header { padding:30px 20px; } header:after { position:static; margin-top:18px; } main { padding:22px 16px 40px; } .layout { grid-template-columns:1fr; } .controls { position:static; } .grid { grid-template-columns:1fr; } }
     @media (max-width: 560px) { body { font-size:14px; } header { padding:24px 16px; } header:before { font-size:9px; letter-spacing:.09em; } h1 { font-size:clamp(25px,9vw,38px); line-height:1.05; } header p { font-size:13px; } main { padding:16px 10px 28px; } .card, .decision { padding:15px; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; } .metric { padding:12px 10px; } .metric strong { font-size:21px; } .metric span { font-size:10px; } .seg { display:grid; grid-template-columns:repeat(3,1fr); } .seg button { padding:9px 4px; font-size:12px; } .bar-row { grid-template-columns:92px minmax(60px,1fr) 56px; gap:6px; font-size:12px; } .decision h2 { font-size:19px; } .notice { font-size:13px; } }
+
+    .score-help { position:relative; cursor:help; color:var(--cyan); }
+    .score-help:after { content:attr(data-tooltip); position:absolute; z-index:10; left:0; top:calc(100% + 8px); width:min(320px,70vw); padding:12px 14px; background:#15272a; border:1px solid var(--cyan); color:#d9e8e2; white-space:normal; line-height:1.45; font-size:12px; font-weight:400; letter-spacing:0; text-transform:none; box-shadow:0 8px 22px #000b; opacity:0; pointer-events:none; transform:translateY(-4px); transition:opacity .15s ease, transform .15s ease; }
+    .score-help:hover:after, .score-help:focus:after { opacity:1; transform:translateY(0); }
 </style>
 </head>
 <body>
@@ -85,7 +89,7 @@
           <div class="card"><h2>Channel economics at your price</h2><div id="bars"></div><p class="data-note">Contribution is per can after channel-specific deductions, from Exhibit 11. A channel mix must total 100%.</p></div>
           <div class="decision"><span class="tag" id="recommendationTag">Balanced case</span><h2 id="recommendation">€2.19 is the defensible launch point.</h2><p id="rationale"></p><p class="data-note" id="tradeoff"></p></div>
         </div>
-        <div class="card" style="margin-top:20px"><h2>Two leadership lenses</h2><table><thead><tr><th>Lens</th><th>What it rewards</th><th>What it gives up</th><th>Scenario score</th></tr></thead><tbody id="lensRows"></tbody></table></div>
+        <div class="card" style="margin-top:20px"><h2>Two leadership lenses</h2><table><thead><tr><th>Lens</th><th>What it rewards</th><th>What it gives up</th><th class="score-help" tabindex="0" data-tooltip="A 0–100 fit score for the selected lens. Premium weighs price signal, acceptance, unit contribution and LTV:CAC; ROI weighs contribution, LTV:CAC and payback; Balanced averages both. Higher means a better fit for that lens.">Scenario score</th></tr></thead><tbody id="lensRows"></tbody></table></div>
         <p class="data-note" id="dataStatus">Using verified Exhibit 11 pricing-test values and transparent fallback marketing benchmarks. When hosted from this repository, the app also reads the CSV data files directly.</p>
       </section>
     </div>
