@@ -70,13 +70,31 @@
     .strategic-analysis table { display:table; white-space:normal; }
     .strategic-analysis th, .strategic-analysis td { vertical-align:top; padding:10px 8px; }
     @media(max-width:560px) { .strategic-analysis table { display:block; overflow-x:auto; white-space:nowrap; } .strategic-analysis h2 { font-size:21px; } }
+
+    .decision-graph { margin:24px 0; }
+    .decision-chart { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:end; margin-top:18px; }
+    .decision-column { min-width:0; padding:14px; border:1px solid var(--line); background:#101d20; }
+    .decision-column h3 { color:var(--cyan); font-size:13px; margin:0 0 12px; text-transform:uppercase; letter-spacing:.08em; }
+    .decision-column .score-track { height:150px; display:flex; align-items:flex-end; border-bottom:1px solid #48676a; background:repeating-linear-gradient(to top,transparent 0 29px,#294044 30px); }
+    .decision-column .score-bar { width:52%; margin:0 auto; background:linear-gradient(180deg,var(--cyan),#477f7e); min-height:8px; position:relative; }
+    .decision-column .score-bar strong { position:absolute; top:-24px; left:50%; transform:translateX(-50%); color:#e4f4ed; font-size:18px; }
+    .decision-stats { display:grid; gap:5px; margin-top:12px; color:#b9cbc4; font-size:12px; }
+    .decision-stats b { color:#edf6f0; }
+    @media(max-width:560px) { .decision-chart { grid-template-columns:1fr; } .decision-column .score-track { height:110px; } }
 </style>
 </head>
 <body>
   <header><h1>Germany Decision Cockpit</h1><p>Compare the consequences of LUMEN’s launch choices—price, commercial channel and acquisition investment—before committing to a German market entry plan.</p></header>
   <main>
     <div class="notice"><strong>This is a scenario model, not a German-sales forecast.</strong> LUMEN has no German sales history. The cockpit applies German price-test results and home-market marketing benchmarks, then makes every assumption visible.</div>
-    <div class="layout">
+    
+    <section class="card decision-graph" aria-labelledby="decision-graph-title">
+      <p class="analysis-kicker">DECISION TRAJECTORY / SCENARIO COMPARISON</p>
+      <h2 id="decision-graph-title">How the decision changes the outcome</h2>
+      <p class="data-note">Each column applies the cockpit’s preset for that leadership lens. The bar is the 0–100 fit score; the figures underneath show the operational consequence.</p>
+      <div class="decision-chart" id="decisionChart"></div>
+    </section>
+<div class="layout">
       <aside class="card controls">
         <h2>Scenario inputs</h2>
         <div class="field"><label for="priority">Decision priority</label><select id="priority"><option value="custom">Custom</option><option value="balanced">Balanced recommendation</option><option value="premium">CMO: premium positioning</option><option value="roi">CFO: fast payback</option></select><small>Changes the score, not the underlying evidence.</small></div>
@@ -175,6 +193,13 @@
     // Optional enhancement: existing repository files can replace the seeded numbers when served from the repo root.
     async function enrich(){ try { const text=await (await fetch('data/price_test_results.csv')).text(); if(!text.includes('price_eur')) throw Error(); el('dataStatus').textContent='Live repository data connected: Exhibit 11 pricing tests loaded. No respondent-level customer data is read or displayed.'; } catch(e){} }
     enrich();
-  </script>
+  
+    function renderDecisionGraph(){
+      const cases=[{id:"premium",name:"CMO: premium",price:"2.59",budget:100000,repeat:12,dtc:30,retail:40,gym:30},{id:"balanced",name:"Balanced",price:"2.19",budget:60000,repeat:12,dtc:40,retail:35,gym:25},{id:"roi",name:"CFO: fast ROI",price:"1.79",budget:40000,repeat:12,dtc:40,retail:25,gym:35}];
+      const labels={DTC:"DTC",Retail:"Retail",Gym:"Gym"};
+      const html=cases.map(c=>{ const p=priceTests[c.price], total=c.dtc+c.retail+c.gym, w={DTC:c.dtc/total,Retail:c.retail/total,Gym:c.gym/total}; const unit=Object.keys(w).reduce((s,k)=>s+w[k]*p[k],0), cac=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].cac,0), ltv=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].ltv,0); const customers=(c.budget/cac)*(p.acceptance/51.7), annual=customers*c.repeat*unit, payback=c.budget/Math.max(annual/12,1); const premium=(+c.price-1.79)/.8*45+(p.acceptance/61.7)*20+(unit/1.54)*20+(ltv/cac/3)*15, roi=(unit/1.54)*35+(ltv/cac/3)*35+(1/Math.max(payback,1))*30, score=c.id==="premium"?premium:c.id==="roi"?roi:(premium+roi)/2; return `<article class="decision-column"><h3>${c.name}</h3><div class="score-track"><div class="score-bar" style="height:${Math.min(score,100)}%"><strong>${Math.round(score)}</strong></div></div><div class="decision-stats"><span>Price <b>€${c.price}</b></span><span>Acceptance <b>${p.acceptance.toFixed(1)}%</b></span><span>Annual contribution <b>${euro(annual)}</b></span><span>Payback <b>${payback>24?"24+":payback.toFixed(1)} mo</b></span></div></article>`; }).join(""); el("decisionChart").innerHTML=html;
+    }
+    renderDecisionGraph();
+</script>
 </body>
 </html>
