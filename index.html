@@ -203,7 +203,9 @@
       el('month').selectedIndex=selected.index; calc();
     }
     document.querySelectorAll('#prices button').forEach(b=>b.addEventListener('click',()=>{price=b.dataset.price;el('priority').value='custom';document.querySelectorAll('#prices button').forEach(x=>x.classList.toggle('active',x===b));calc();}));
-    document.querySelectorAll('input,select').forEach(x=>{if(x.id!=='priority'){const markCustom=()=>{el('priority').value='custom';calc();};x.addEventListener('input',markCustom);x.addEventListener('change',markCustom);}});
+    document.querySelectorAll('input,select').forEach(x=>{if(x.id!=='priority' && !['dtc','retail','gym'].includes(x.id)){const markCustom=()=>{el('priority').value='custom';calc();};x.addEventListener('input',markCustom);x.addEventListener('change',markCustom);}});
+    let lastMix={dtc:+el('dtc').value,retail:+el('retail').value,gym:+el('gym').value};
+    ['dtc','retail','gym'].forEach(id=>el(id).addEventListener('input',()=>{const others=['dtc','retail','gym'].filter(other=>other!==id);const chosen=Math.max(0,Math.min(100,+el(id).value));const remaining=100-chosen;const previousTotal=others.reduce((sum,other)=>sum+(lastMix[other]||0),0)||1;el(id).value=chosen;others.forEach(other=>el(other).value=Math.round(remaining*(lastMix[other]||0)/previousTotal));let correction=100-(['dtc','retail','gym'].reduce((sum,key)=>sum+(+el(key).value),0));el(others[0]).value=+el(others[0]).value+correction;lastMix={dtc:+el('dtc').value,retail:+el('retail').value,gym:+el('gym').value};el('priority').value='custom';calc();}));
     el('priority').addEventListener('change',applyPriorityDefaults); calc();
     // Optional enhancement: existing repository files can replace the seeded numbers when served from the repo root.
     async function enrich(){ try { const text=await (await fetch('data/price_test_results.csv')).text(); if(!text.includes('price_eur')) throw Error(); el('dataStatus').textContent='Live repository data connected: Exhibit 11 pricing tests loaded. No respondent-level customer data is read or displayed.'; } catch(e){} }
