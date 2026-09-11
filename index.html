@@ -204,14 +204,17 @@ Raw
     function applyPriorityDefaults(){
       const priority=el('priority').value;
       const presets={
-        premium:{price:'2.59',budget:100000,repeat:12,month:'1.18',dtc:30,retail:40,gym:30},
-        roi:{price:'1.79',budget:40000,repeat:12,month:'1.18',dtc:40,retail:25,gym:35},
-        balanced:{price:'2.19',budget:60000,repeat:12,month:'1.06',dtc:40,retail:35,gym:25}
+        premium:{price:'2.59',budget:100000,repeat:12,dtc:30,retail:40,gym:30},
+        roi:{price:'1.79',budget:40000,repeat:12,dtc:40,retail:25,gym:35},
+        balanced:{price:'2.19',budget:60000,repeat:12,dtc:40,retail:35,gym:25}
       };
       const p=presets[priority]; price=p.price;
       document.querySelectorAll('#prices button').forEach(x=>x.classList.toggle('active',x.dataset.price===price));
-      el('budget').value=p.budget; el('repeat').value=p.repeat; el('month').value=p.month;
-      el('dtc').value=p.dtc; el('retail').value=p.retail; el('gym').value=p.gym; calc();
+      el('budget').value=p.budget; el('repeat').value=p.repeat;
+      el('dtc').value=p.dtc; el('retail').value=p.retail; el('gym').value=p.gym;
+      const months=[...el('month').options];
+      const selected=months.map((option,index)=>{ const season=+option.value; const raw={DTC:p.dtc,Retail:p.retail,Gym:p.gym}; const total=p.dtc+p.retail+p.gym; const w={DTC:raw.DTC/total,Retail:raw.Retail/total,Gym:raw.Gym/total}; const test=priceTests[price]; const unit=Object.keys(w).reduce((sum,k)=>sum+w[k]*test[k],0); const cac=Object.keys(w).reduce((sum,k)=>sum+w[k]*marketing[k].cac,0); const customers=(p.budget/cac)*season*(test.acceptance/51.7); const contribution=customers*p.repeat*unit; const payback=p.budget/Math.max(contribution/12,1); const premium=(+price-1.79)/.8*45+(test.acceptance/61.7)*20+(unit/1.54)*20+(Object.keys(w).reduce((sum,k)=>sum+w[k]*marketing[k].ltv,0)/cac/3)*15; const roi=(unit/1.54)*35+(Object.keys(w).reduce((sum,k)=>sum+w[k]*marketing[k].ltv,0)/cac/3)*35+(1/Math.max(payback,1))*30; return {index,season,contribution,payback,score:priority==='premium'?contribution:priority==='roi'?1/payback:(premium+roi)/2}; }).sort((a,b)=>b.score-a.score)[0];
+      el('month').selectedIndex=selected.index; calc();
     }
     document.querySelectorAll('#prices button').forEach(b=>b.addEventListener('click',()=>{price=b.dataset.price;document.querySelectorAll('#prices button').forEach(x=>x.classList.toggle('active',x===b));calc();}));
     document.querySelectorAll('input,select').forEach(x=>{x.addEventListener('input',calc);x.addEventListener('change',calc);});
