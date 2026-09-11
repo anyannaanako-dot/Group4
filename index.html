@@ -84,7 +84,7 @@
     .decision-stats b { color:#edf6f0; }
     @media(max-width:560px) { .decision-chart { grid-template-columns:1fr; } .decision-column .score-track { height:110px; } }
 
-    .decision-curve { margin:0; align-self:start; grid-column:2; grid-row:1; min-height:320px; position:relative; z-index:3; overflow:visible; }
+    .decision-curve { margin-top:20px; min-height:320px; position:relative; z-index:1; overflow:visible; }
     .curve-legend { display:flex; gap:20px; flex-wrap:wrap; color:#b9cbc4; font-size:12px; margin:14px 0 4px; }
     .curve-legend i { display:inline-block; width:20px; height:3px; margin-right:6px; vertical-align:middle; }
     .legend-value { background:var(--cyan); }.legend-cost { background:var(--orange); }
@@ -114,13 +114,7 @@
         <div class="field"><label for="gym">Gym &amp; office <span class="value" id="gymLabel">25%</span></label><input id="gym" type="range" min="0" max="100" value="25"><small id="mixWarning"></small></div>
       </aside>
       
-    <section class="card decision-curve" aria-labelledby="decision-curve-title">
-      <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
-      <h2 id="decision-curve-title">Value created over the launch year</h2>
-      <p class="data-note">The curve updates with the scenario inputs above. It includes seasonality, demand ramp-up and channel adoption, so different choices create different trajectories. The x-axis starts at the selected launch month and follows the next 12 months.</p>
-      <p class="data-note" id="curveAssumptions"></p><div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span></div>
-      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created curve"></svg>
-    </section>
+
       <section>
         <div class="metrics">
           <div class="metric accent"><strong id="acceptance">51.7%</strong><span>Estimated price acceptance</span></div>
@@ -128,6 +122,13 @@
           <div class="metric"><strong id="contribution">€15.8k</strong><span>Annual contribution after unit costs</span></div>
           <div class="metric warn"><strong id="payback">4.4 mo</strong><span>Marketing payback estimate</span></div>
         </div>
+    <section class="card decision-curve" aria-labelledby="decision-curve-title">
+      <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
+      <h2 id="decision-curve-title">Value created over the launch year</h2>
+      <p class="data-note">The curve updates with the scenario inputs above. It includes seasonality, demand ramp-up and channel adoption, so different choices create different trajectories. The x-axis starts at the selected launch month and follows the next 12 months.</p>
+      <p class="data-note" id="curveAssumptions"></p><div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span></div>
+      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created curve"></svg>
+    </section>
         <div class="grid">
           <div class="card"><h2>Channel economics at your price</h2><div id="bars"></div><p class="data-note">Contribution is per can after channel-specific deductions, from Exhibit 11. A channel mix must total 100%.</p></div>
           <div class="decision"><span class="tag" id="recommendationTag">Balanced case</span><h2 id="recommendation">€2.19 is the defensible launch point.</h2><p id="rationale"></p><p class="data-note" id="tradeoff"></p></div>
