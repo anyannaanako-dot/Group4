@@ -97,14 +97,14 @@
   <header><h1>Germany Decision Cockpit</h1><p>Compare the consequences of LUMEN’s launch choices—price, commercial channel and acquisition investment—before committing to a German market entry plan.</p></header>
   <main>
     <div class="notice"><strong>This is a scenario model, not a German-sales forecast.</strong> LUMEN has no German sales history. The cockpit applies German price-test results and home-market marketing benchmarks, then makes every assumption visible.</div>
-
     <section class="card decision-curve" aria-labelledby="decision-curve-title">
       <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
-      <h2 id="decision-curve-title">Value created vs. acquisition cost</h2>
-      <p class="data-note">The curves update with the scenario inputs above. Value created is estimated monthly contribution; cost is the monthly share of the launch acquisition budget.</p>
-      <div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span><span><i class="legend-cost"></i>Acquisition cost</span></div>
-      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created and acquisition cost curves"></svg>
+      <h2 id="decision-curve-title">Value created over the launch year</h2>
+      <p class="data-note">The curve updates with the scenario inputs above. The x-axis starts at the selected launch month and follows the next 12 months.</p>
+      <div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span></div>
+      <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created curve"></svg>
     </section>
+
 <div class="layout">
       <aside class="card controls">
         <h2>Scenario inputs</h2>
@@ -204,9 +204,8 @@
     // Optional enhancement: existing repository files can replace the seeded numbers when served from the repo root.
     async function enrich(){ try { const text=await (await fetch('data/price_test_results.csv')).text(); if(!text.includes('price_eur')) throw Error(); el('dataStatus').textContent='Live repository data connected: Exhibit 11 pricing tests loaded. No respondent-level customer data is read or displayed.'; } catch(e){} }
     enrich();
-
     function renderTrajectoryChart(){
-      const svg=el("trajectorySvg"); if(!svg) return; const p=priceTests[price], {w}=weights(), budget=+el("budget").value, repeats=+el("repeat").value; const unit=Object.keys(w).reduce((s,k)=>s+w[k]*p[k],0), cac=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].cac,0); const months=[...el("month").options].map((o,i)=>({name:o.textContent.slice(0,3),season:+o.value,index:i})); const points=months.map(m=>{const customers=(budget/cac)*m.season*(p.acceptance/51.7); return {value:customers*repeats*unit/12,cost:budget/12};}); const max=Math.max(...points.flatMap(x=>[x.value,x.cost]),1)*1.18, W=760,H=320,L=52,R=18,T=18,B=42, pw=W-L-R, ph=H-T-B; const x=i=>L+(i/(points.length-1))*pw, y=v=>T+ph-(v/max)*ph; const poly=(key,cls)=>`<polyline class="${cls}" points="${points.map((p,i)=>x(i)+","+y(p[key])).join(" ")}"/>`; const dots=(key,cls)=>points.map((p,i)=>`<circle class="${cls}" cx="${x(i)}" cy="${y(p[key])}" r="3"/>`).join(""); const grid=[0,.25,.5,.75,1].map(t=>`<line class="gridline" x1="${L}" x2="${W-R}" y1="${y(max*t)}" y2="${y(max*t)}"/><text x="${L-8}" y="${y(max*t)+4}" text-anchor="end">${euro(max*t)}</text>`).join(""); const labels=months.map((m,i)=>`<text x="${x(i)}" y="${H-16}" text-anchor="middle">${m.name}</text>`).join(""); svg.innerHTML=`${grid}<line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${H-B}"/><line class="axis" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>${poly("value","value-line")}${poly("cost","cost-line")}${dots("value","value-dot")}${dots("cost","cost-dot")}${labels}<text x="${L}" y="12">€ / month</text>`;
+      const svg=el("trajectorySvg"); if(!svg) return; const p=priceTests[price], {w}=weights(), budget=+el("budget").value, repeats=+el("repeat").value, start=el("month").selectedIndex; const all=[...el("month").options]; const months=all.slice(start).concat(all.slice(0,start)).map(o=>({name:o.textContent.slice(0,3),season:+o.value})); const unit=Object.keys(w).reduce((s,k)=>s+w[k]*p[k],0), cac=Object.keys(w).reduce((s,k)=>s+w[k]*marketing[k].cac,0); const points=months.map(m=>({value:(budget/cac)*m.season*(p.acceptance/51.7)*repeats*unit/12})); const max=Math.max(...points.map(x=>x.value),1)*1.18,W=760,H=320,L=52,R=18,T=18,B=42,pw=W-L-R,ph=H-T-B,x=i=>L+i/(points.length-1)*pw,y=v=>T+ph-v/max*ph; const grid=[0,.25,.5,.75,1].map(t=>`<line class="gridline" x1="${L}" x2="${W-R}" y1="${y(max*t)}" y2="${y(max*t)}"/><text x="${L-8}" y="${y(max*t)+4}" text-anchor="end">${euro(max*t)}</text>`).join(""); const line=`<polyline class="value-line" points="${points.map((p,i)=>x(i)+","+y(p.value)).join(" ")}"/>`; const dots=points.map((p,i)=>`<circle class="value-dot" cx="${x(i)}" cy="${y(p.value)}" r="3"/>`).join(""); const labels=months.map((m,i)=>`<text x="${x(i)}" y="${H-16}" text-anchor="middle">${m.name}</text>`).join(""); svg.innerHTML=`${grid}<line class="axis" x1="${L}" x2="${L}" y1="${T}" y2="${H-B}"/><line class="axis" x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}"/>${line}${dots}${labels}<text x="${L}" y="12">€ / month</text>`;
     }
     renderTrajectoryChart();</script>
 </body>
