@@ -82,7 +82,7 @@
     .decision-stats b { color:#edf6f0; }
     @media(max-width:560px) { .decision-chart { grid-template-columns:1fr; } .decision-column .score-track { height:110px; } }
 
-    .decision-curve { margin:24px 0; }
+    .decision-curve { margin:0; align-self:start; }
     .curve-legend { display:flex; gap:20px; flex-wrap:wrap; color:#b9cbc4; font-size:12px; margin:14px 0 4px; }
     .curve-legend i { display:inline-block; width:20px; height:3px; margin-right:6px; vertical-align:middle; }
     .legend-value { background:var(--cyan); }.legend-cost { background:var(--orange); }
@@ -110,6 +110,7 @@
         <div class="field"><label for="dtc">DTC online <span class="value" id="dtcLabel">40%</span></label><input id="dtc" type="range" min="0" max="100" value="40"></div>
         <div class="field"><label for="retail">Retail / grocery <span class="value" id="retailLabel">35%</span></label><input id="retail" type="range" min="0" max="100" value="35"></div>
         <div class="field"><label for="gym">Gym &amp; office <span class="value" id="gymLabel">25%</span></label><input id="gym" type="range" min="0" max="100" value="25"><small id="mixWarning"></small></div>
+      </aside>
       
     <section class="card decision-curve" aria-labelledby="decision-curve-title">
       <p class="analysis-kicker">MONTHLY ECONOMIC TRAJECTORY / LIVE SCENARIO</p>
@@ -117,7 +118,7 @@
       <p class="data-note">The curve updates with the scenario inputs above. It includes seasonality, demand ramp-up and channel adoption, so different choices create different trajectories. The x-axis starts at the selected launch month and follows the next 12 months.</p>
       <p class="data-note" id="curveAssumptions"></p><div class="curve-legend"><span><i class="legend-value"></i>Value created / profit</span></div>
       <svg id="trajectorySvg" class="trajectory-svg" viewBox="0 0 760 320" role="img" aria-label="Monthly value created curve"></svg>
-    </section></aside>
+    </section>
       <section>
         <div class="metrics">
           <div class="metric accent"><strong id="acceptance">51.7%</strong><span>Estimated price acceptance</span></div>
