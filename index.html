@@ -50,7 +50,7 @@
     /* Responsive cockpit layout */
     html { overflow-x:hidden; }
     .layout { grid-template-columns:minmax(260px,360px) minmax(0,1fr); }
-    .layout > section:not(.decision-curve) { grid-column:2; grid-row:1 / span 2; min-width:0; }
+    .layout > section:not(.decision-curve) { grid-column:2; grid-row:2; min-width:0; }
     .metrics { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
     .grid { grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr); }
     table { display:block; overflow-x:auto; white-space:nowrap; }
@@ -83,7 +83,7 @@
     .decision-stats b { color:#edf6f0; }
     @media(max-width:560px) { .decision-chart { grid-template-columns:1fr; } .decision-column .score-track { height:110px; } }
 
-    .decision-curve { margin:0; align-self:start; grid-column:1; grid-row:2; }
+    .decision-curve { margin:0; align-self:start; grid-column:2; grid-row:1; }
     .curve-legend { display:flex; gap:20px; flex-wrap:wrap; color:#b9cbc4; font-size:12px; margin:14px 0 4px; }
     .curve-legend i { display:inline-block; width:20px; height:3px; margin-right:6px; vertical-align:middle; }
     .legend-value { background:var(--cyan); }.legend-cost { background:var(--orange); }
