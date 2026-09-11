@@ -79,8 +79,19 @@
       el('tradeoff').textContent=price==='2.59'?'Trade-off: the margin is strongest, but estimated acceptance falls to 26.7%—nearly half the mid-price case.':price==='1.79'?'Trade-off: acceptance is strongest, but retail contribution is only €0.40 per can.':'Trade-off: it does not maximise either headline acceptance or unit margin; it deliberately protects both.';
       el('lensRows').innerHTML=`<tr><td>CMO: premium</td><td>Price signal, contribution, LTV:CAC</td><td>Reach / acceptance</td><td>${Math.round(premiumScore)}/100</td></tr><tr><td>CFO: fast ROI</td><td>Contribution, LTV:CAC, payback</td><td>Premium signal</td><td>${Math.round(roiScore)}/100</td></tr><tr><td>Balanced</td><td>Both perspectives</td><td>Extreme optimisation</td><td>${Math.round(balanced)}/100</td></tr>`;
     }
+    function applyPriorityDefaults(){
+      const priority=el('priority').value;
+      const presets={premium:{price:'2.59',budget:100000,repeat:12,dtc:30,retail:40,gym:30},roi:{price:'1.79',budget:40000,repeat:12,dtc:40,retail:25,gym:35},balanced:{price:'2.19',budget:60000,repeat:12,dtc:40,retail:35,gym:25}};
+      const p=presets[priority]; price=p.price;
+      document.querySelectorAll('#prices button').forEach(x=>x.classList.toggle('active',x.dataset.price===price));
+      el('budget').value=p.budget; el('repeat').value=p.repeat; el('dtc').value=p.dtc; el('retail').value=p.retail; el('gym').value=p.gym;
+      const months=[...el('month').options];
+      const selected=months.map((option,index)=>{ const season=+option.value; const total=p.dtc+p.retail+p.gym; const w={DTC:p.dtc/total,Retail:p.retail/total,Gym:p.gym/total}; const test=priceTests[price]; const unit=Object.keys(w).reduce((sum,k)=>sum+w[k]*test[k],0); const cac=Object.keys(w).reduce((sum,k)=>sum+w[k]*marketing[k].cac,0); const ltv=Object.keys(w).reduce((sum,k)=>sum+w[k]*marketing[k].ltv,0); const customers=(p.budget/cac)*season*(test.acceptance/51.7); const contribution=customers*p.repeat*unit; const payback=p.budget/Math.max(contribution/12,1); const premium=(+price-1.79)/.8*45+(test.acceptance/61.7)*20+(unit/1.54)*20+(ltv/cac/3)*15; const roi=(unit/1.54)*35+(ltv/cac/3)*35+(1/Math.max(payback,1))*30; return {index,score:priority==='premium'?contribution:priority==='roi'?1/payback:(premium+roi)/2}; }).sort((a,b)=>b.score-a.score)[0];
+      el('month').selectedIndex=selected.index; calc();
+    }
     document.querySelectorAll('#prices button').forEach(b=>b.addEventListener('click',()=>{price=b.dataset.price;document.querySelectorAll('#prices button').forEach(x=>x.classList.toggle('active',x===b));calc();}));
-    document.querySelectorAll('input,select').forEach(x=>x.addEventListener('input',calc)); calc();
+    document.querySelectorAll('input,select').forEach(x=>{x.addEventListener('input',calc);x.addEventListener('change',calc);});
+    el('priority').addEventListener('change',applyPriorityDefaults); calc();
     // Optional enhancement: existing repository files can replace the seeded numbers when served from the repo root.
     async function enrich(){ try { const text=await (await fetch('data/price_test_results.csv')).text(); if(!text.includes('price_eur')) throw Error(); el('dataStatus').textContent='Live repository data connected: Exhibit 11 pricing tests loaded. No respondent-level customer data is read or displayed.'; } catch(e){} }
     enrich();
